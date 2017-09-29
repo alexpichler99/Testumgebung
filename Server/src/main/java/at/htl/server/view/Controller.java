@@ -6,10 +6,7 @@ import at.htl.common.actions.IpConnection;
 import at.htl.common.fx.FxUtils;
 import at.htl.common.fx.StudentView;
 import at.htl.common.io.FileUtils;
-import at.htl.server.PatrolMode;
-import at.htl.server.Server;
-import at.htl.server.Settings;
-import at.htl.server.Threader;
+import at.htl.server.*;
 import at.htl.server.advanced.AdvancedSettingsPackage;
 import at.htl.server.entity.Interval;
 import at.htl.server.entity.Student;
@@ -251,6 +248,9 @@ public class Controller implements Initializable {
 
     private Thread server;
     private Threader threader;
+
+    private Thread broadcast;
+    private Broadcaster broadcaster;
     //endregion
 
     //region INITIALIZE and Constructor
@@ -426,6 +426,11 @@ public class Controller implements Initializable {
             threader = new Threader();
             server = new Thread(threader);
             server.start();
+
+            broadcaster = new Broadcaster();
+            broadcast = new Thread(broadcaster);
+            broadcast.start();
+
             btnStart.setDisable(true);
             btnStop.setDisable(false);
             setMsg(false, "Server is running");
@@ -446,6 +451,9 @@ public class Controller implements Initializable {
      */
     @FXML
     public void stopServer() {
+        if (broadcast != null)
+            broadcast.interrupt();
+
         if (server != null) {
             if (!server.isInterrupted()) {
                 threader.stop();
