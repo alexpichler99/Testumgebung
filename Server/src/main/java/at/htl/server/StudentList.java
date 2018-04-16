@@ -40,8 +40,7 @@ public class StudentList {
 
     public void addStudent(Student student) {
         for (Student stud : curStudentList) {
-            if (stud.getStudentIpAddress().equals(student.getStudentIpAddress())
-                    || stud.getPupil().getEnrolmentID().equals(student.getPupil().getEnrolmentID())) {
+            if (stud.getPupil().getEnrolmentID().equals(student.getPupil().getEnrolmentID())) {
                 updateStudent(student);
                 return;
             }
@@ -124,8 +123,7 @@ public class StudentList {
 
     public void updateStudent(Student student) {
         for (Student stud : curStudentList) {
-            if (stud.getStudentIpAddress().equals(student.getStudentIpAddress())
-                    || stud.getPupil().getEnrolmentID().equals(student.getPupil().getEnrolmentID())) {
+            if (stud.getPupil().getEnrolmentID().equals(student.getPupil().getEnrolmentID())) {
                 stud = student;
                 updateButtons();
                 return;
