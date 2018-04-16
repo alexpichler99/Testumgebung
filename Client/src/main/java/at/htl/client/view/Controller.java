@@ -37,6 +37,7 @@ import java.io.File;
 import java.net.URL;
 import java.time.LocalTime;
 import java.util.ResourceBundle;
+import java.util.regex.Pattern;
 
 import static at.htl.common.transfer.Packet.Action;
 import static at.htl.common.transfer.Packet.Resource;
@@ -378,10 +379,10 @@ public class Controller implements Initializable {
         else if (lastName.length() > 20) {
             setMsg("Your last name should not be longer than 20 characters", 0);
         }
-        else if (!lastName.chars().allMatch(Character::isLetter)) {
+        else if (!Pattern.compile("[a-zA-ZäöüÄÖÜ]").matcher(lastName).find()) {
             setMsg("Unknown letter in your lastname. Allowed: A-Z", 0);
         }
-        else if (!firstName.chars().allMatch(Character::isLetter)) {
+        else if (!Pattern.compile("[a-zA-ZäöüÄÖÜ]").matcher(lastName).find()) {
             setMsg("Unknown letter in your firstname. Allowed: A-Z", 0);
         }
         else if (firstName.length() < 3) {
