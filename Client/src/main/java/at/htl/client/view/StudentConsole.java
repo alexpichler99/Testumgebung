@@ -60,7 +60,7 @@ public class StudentConsole {
                 } else if (input == (int) 'f') {
                     controller.toggleFinishedTest();
                 }
-                System.out.println("[x] Exit | [p] Properties | [f] Toggle Test finished to " + controller.isTestFinished());
+                System.out.println("[x] Exit | [p] Properties | [f] Toggle Test finished to " + !controller.isTestFinished());
             }
         }
         controller.logout();
@@ -79,20 +79,71 @@ public class StudentConsole {
     }
 
     private static void editProperties(Properties properties) {
-        System.out.println("IP");
-        properties.setProperty("ip", readLine());
-        System.out.println("PORT");
-        properties.setProperty("port", readLine());
-        System.out.println("EnrolementId");
-        properties.setProperty("enrolementId", readLine());
-        System.out.println("CatalogNr");
-        properties.setProperty("catalogNr", readLine());
-        System.out.println("Firstname");
-        properties.setProperty("firstName", readLine());
-        System.out.println("Lastname");
-        properties.setProperty("lastName", readLine());
-        System.out.println("Projectpath");
-        properties.setProperty("pathOfProject", readLine());
+        System.out.print(String.format("%30s: ","Server IP"));
+        String ip = readLine();
+        if(validIP(ip)){
+            properties.setProperty("ip",ip );;
+
+            try {
+
+                System.out.print(String.format("%30s: ","PORT"));
+                String port = readLine();
+                if(Integer.parseInt(port)<=0){
+                    printError("Port is negative");
+                }
+
+                properties.setProperty("port", port);
+
+            } catch (NumberFormatException e) {
+                printError("Port invalid");
+            }
+
+            System.out.print(String.format("%30s: ","EnrolementId (like it170001)"));
+            String enrolementId = readLine();
+            if(!enrolementId.isEmpty()){
+                properties.setProperty("enrolementId", enrolementId);
+
+
+                System.out.print(String.format("%30s: ","CatalogNr"));
+                String catalogNr = readLine();
+                if(!catalogNr.isEmpty()){
+                    properties.setProperty("catalogNr", catalogNr);
+
+                    System.out.print(String.format("%30s: ","Firstname"));
+                    String firstName = readLine();
+                    if(!firstName.isEmpty()){
+                        properties.setProperty("firstName", firstName);
+
+                        System.out.print(String.format("%30s: ", "Lastname"));
+                        String lastName = readLine();
+                        if(!lastName.isEmpty()){
+                            properties.setProperty("lastName", lastName);
+
+                            System.out.print(String.format("%30s: ","Projectpath"));
+                            String projectPath = readLine();
+                            if(new File(projectPath).exists()){
+                                properties.setProperty("pathOfProject", projectPath);
+                            }
+                            else {
+                                printError("Project Path invalid");
+                            }
+                        }
+                        else {
+                            printError("Lastname empty");
+                        }
+                    } else{
+                        printError("Firstname empty");
+                    }
+                } else{
+                    printError("CatalogNr empty");
+                }
+            } else{
+                printError("EnrolementId empty");
+            }
+        }
+        else {
+            printError("IP invalid");
+        }
     }
 
     public static void printProperties(Properties properties) {
@@ -116,5 +167,39 @@ public class StudentConsole {
     private static String readLine() {
         Scanner in = new Scanner(System.in);
         return in.next();
+    }
+
+    public static void printError(String msg){
+        System.err.println("---------------------------------------------------");
+        System.err.println("ERROR: "+msg);
+        System.err.println("---------------------------------------------------");
+        System.exit(1);
+    }
+
+    public static boolean validIP (String ip) {
+        try {
+            if ( ip == null || ip.isEmpty() ) {
+                return false;
+            }
+
+            String[] parts = ip.split( "\\." );
+            if ( parts.length != 4 ) {
+                return false;
+            }
+
+            for ( String s : parts ) {
+                int i = Integer.parseInt( s );
+                if ( (i < 0) || (i > 255) ) {
+                    return false;
+                }
+            }
+            if ( ip.endsWith(".") ) {
+                return false;
+            }
+
+            return true;
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
     }
 }
