@@ -63,6 +63,10 @@ class SocketReaderThread extends Thread {
                     student.setStudentState(StudentState.FINISHED);
                     StudentList.getStudentList().updateStudent(student);
                 }
+                else{
+                    student.setStudentState(StudentState.NORMAL);
+                    StudentList.getStudentList().updateStudent(student);
+                }
 
             } catch (Exception ex) {
                 FileUtils.log(this, Level.INFO, "canceled " + MyUtils.exceptionToString(ex));

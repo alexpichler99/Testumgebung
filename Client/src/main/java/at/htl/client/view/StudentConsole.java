@@ -6,6 +6,7 @@ import at.htl.common.io.FileUtils;
 import org.apache.logging.log4j.Level;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Properties;
 import java.util.Scanner;
@@ -69,7 +70,9 @@ public class StudentConsole {
     private static Properties getPropertyFile(String filename) {
 
         Properties prop = new Properties();
-        try (InputStream inputStream = new BufferedInputStream(new FileInputStream(filename))) {
+        try (InputStreamReader inputStream = new InputStreamReader(
+                new BufferedInputStream(new FileInputStream(filename)),
+                Charset.forName("UTF-8"))) {
             prop.load(inputStream);
         } catch (IOException e) {
             FileUtils.log(Level.ERROR, e.getMessage());
@@ -157,7 +160,8 @@ public class StudentConsole {
     }
 
     private static void setPropertyFile(String filename, Properties properties) {
-        try (OutputStream stream = new FileOutputStream(filename)) {
+        try (OutputStreamWriter stream = new OutputStreamWriter(new FileOutputStream(filename),
+                Charset.forName("UTF-8"))) {
             properties.store(stream, "Last User settings of 'Testumgebung'");
         } catch (IOException ex) {
             FileUtils.log(Level.ERROR, ex.getMessage());
