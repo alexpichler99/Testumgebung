@@ -151,6 +151,7 @@ public class Controller implements Initializable {
     /**
      * Called from main to set the Stage.
      * Sets event when the Window is closed to logout correctly
+     *
      * @param stage
      */
     public void setStage(Stage stage) {
@@ -187,8 +188,9 @@ public class Controller implements Initializable {
         int port = 0;
         try {
             port = Integer.valueOf(tfPort.getText());
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
         }
-        catch (NumberFormatException e) { }
         IpConnection.isIpReachable(tfServerIP.getText(), port, true, true);
     }
 
@@ -200,8 +202,9 @@ public class Controller implements Initializable {
     public void chooseProjectDirectory() {
         File file = FxUtils.chooseDirectory("Select Project Directory", null);
         //avoid NullPointerException when no file is selected
-        if (file != null)
+        if (file != null) {
             tfPathOfProject.setText(file.getPath());
+        }
     }
 
     /**
@@ -213,8 +216,9 @@ public class Controller implements Initializable {
         int port = 0;
         try {
             port = Integer.valueOf(tfPort.getText());
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
         }
-        catch (NumberFormatException e) { }
 
         if (IpConnection.isIpReachable(tfServerIP.getText(), port, true, false)) {
             if (setExam() && isLoggedOut()) {
@@ -350,48 +354,34 @@ public class Controller implements Initializable {
         boolean validity = false;
         if (serverIP.isEmpty()) {
             setMsg("Specify the IP-Address of the server!", 0);
-        }
-        else if ((serverIP.split("\\.").length != 4 && !serverIP.equals("localhost"))
+        } else if ((serverIP.split("\\.").length != 4 && !serverIP.equals("localhost"))
                 || serverIP.length() > 15) {
             setMsg("Invalid IP-Address!", 0);
-        }
-        else if (port < 1) {
+        } else if (port < 1) {
             setMsg("Invalid Port!", 0);
-        }
-        else if (enrolmentID.isEmpty()) {
+        } else if (enrolmentID.isEmpty()) {
             setMsg("Enter your enrolment id", 0);
-        }
-        else if (enrolmentID.length() >= 10) {
+        } else if (enrolmentID.length() >= 10) {
             setMsg("The enrolment id is too long!", 0);
-        }
-        else if (catalogNumber < 1) {
+        } else if (catalogNumber < 1) {
             setMsg("Invalid catalog number!", 0);
-        }
-        else if (firstName.isEmpty()) {
+        } else if (firstName.isEmpty()) {
             setMsg("Your first name should not be empty", 0);
-        }
-        else if (firstName.length() > 20) {
+        } else if (firstName.length() > 20) {
             setMsg("Your first name should not be longer than 20 characters", 0);
-        }
-        else if (lastName.isEmpty()) {
+        } else if (lastName.isEmpty()) {
             setMsg("Your last name should not be empty", 0);
-        }
-        else if (lastName.length() > 20) {
+        } else if (lastName.length() > 20) {
             setMsg("Your last name should not be longer than 20 characters", 0);
-        }
-        else if (!Pattern.compile("[a-zA-ZäöüÄÖÜ]").matcher(lastName).find()) {
+        } else if (!Pattern.compile("[a-zA-ZäöüÄÖÜ]").matcher(lastName).find()) {
             setMsg("Unknown letter in your lastname. Allowed: A-Z", 0);
-        }
-        else if (!Pattern.compile("[a-zA-ZäöüÄÖÜ]").matcher(lastName).find()) {
+        } else if (!Pattern.compile("[a-zA-ZäöüÄÖÜ]").matcher(lastName).find()) {
             setMsg("Unknown letter in your firstname. Allowed: A-Z", 0);
-        }
-        else if (firstName.length() < 3) {
+        } else if (firstName.length() < 3) {
             setMsg("Your firstname must be at least 3 characters long!", 0);
-        }
-        else if (pathOfProject.isEmpty()) {
+        } else if (pathOfProject.isEmpty()) {
             setMsg("Specify the path of project!", 0);
-        }
-        else {
+        } else {
             validity = true;
         }
         return validity;
@@ -474,13 +464,12 @@ public class Controller implements Initializable {
     /**
      * Sets an message on the screen of the student.
      *
-     * @param text  specifies the message to show
+     * @param text   specifies the message to show
      * @param status
      */
     private void setMsg(String text, int status) {
         FxUtils.setMsg(lbAlert, text, status);
     }
-
 
 
 }
