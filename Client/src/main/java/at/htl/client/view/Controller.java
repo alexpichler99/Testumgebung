@@ -83,8 +83,6 @@ public class Controller implements Initializable {
 
     //region Controls
     @FXML
-    private BorderPane borderPane;
-    @FXML
     private TextField tfServerIP;
     @FXML
     private TextField tfPort;
@@ -98,8 +96,6 @@ public class Controller implements Initializable {
     private TextField tfLastName;
     @FXML
     private TextField tfPathOfProject;
-    @FXML
-    private Button btnTestConnection;
     @FXML
     private CheckBox cbNoLogin;
     @FXML
@@ -118,7 +114,6 @@ public class Controller implements Initializable {
     private Label lbTimeLeft;
     @FXML
     private Text txTimeLeft;
-    private Text txTimeLeftQuick;
     @FXML
     private Slider sliderPos;
     //endregion
@@ -127,11 +122,8 @@ public class Controller implements Initializable {
     private Countdown countdown;
     private Stage quickInfo;
 
-    public Controller() {
-    }
-
     public void initialize(URL location, ResourceBundle resources) {
-        if (MyUtils.readProperty("settings.properties", "testmode").toLowerCase().equals("false")) {
+        if (MyUtils.readProperty("settings.properties", "testmode").equalsIgnoreCase("false")) {
             cbNoLogin.setVisible(false);
             btnTestMode.setVisible(false);
         }
