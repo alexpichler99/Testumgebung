@@ -10,10 +10,10 @@ public enum StudentState{
             return 0;
         }
         else if(this == FINISHED){
-            return -1;
+            return 1;
         }
         else {
-            return 1;
+            return -1;
         }
     }
 }

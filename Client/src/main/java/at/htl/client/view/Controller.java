@@ -123,7 +123,8 @@ public class Controller implements Initializable {
     private Stage quickInfo;
 
     public void initialize(URL location, ResourceBundle resources) {
-        if (MyUtils.readProperty("settings.properties", "testmode").equalsIgnoreCase("false")) {
+        if (MyUtils.readProperty("settings.properties", "testmode")
+                .equalsIgnoreCase("false")) {
             cbNoLogin.setVisible(false);
             btnTestMode.setVisible(false);
         }

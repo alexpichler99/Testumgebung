@@ -89,7 +89,10 @@ public class StudentList {
     }
 
     private void updateButtons() {
-        sortList();
+
+//        Sort list
+//        sortList();
+
         List<Student> studentList = new ArrayList<>(curStudentList);
 
         Platform.runLater(() -> {

@@ -4,6 +4,7 @@ import at.htl.client.business.TestController;
 import at.htl.common.MyUtils;
 import at.htl.common.io.FileUtils;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -13,9 +14,20 @@ import java.util.Scanner;
 
 public class StudentConsole {
     public static void main(String[] args) throws IOException {
+        printHeader();
+
         TestController controller = new TestController();
 
+        File workingDirectory = new File(System.getProperty("user.dir"));
         File lastUserSettings = new File(System.getProperty("user.dir") + "/user.properties");
+
+        if (!workingDirectory.exists()) {
+            printError(String.format("\"%s\" doesnt exist", System.getProperty("user.dir")));
+            System.exit(-1);
+        } else if (!workingDirectory.canWrite() && !workingDirectory.canRead()) {
+            printError(String.format("\"%s\"-> Permissions insufficient", System.getProperty("user.dir")));
+            System.exit(-1);
+        }
 
         Properties properties = getPropertyFile(lastUserSettings.getAbsolutePath());
 
@@ -26,9 +38,9 @@ public class StudentConsole {
             System.out.println("Enter [u] to use this settings");
             System.out.println("Enter [e] to enter new settings");
             System.out.print("-> ");
-            int input = System.in.read();
+            String input = readLine();
 
-            if (input == (int) 'e') {
+            if (input != null && input.equalsIgnoreCase("e")) {
                 editProperties(properties);
                 setPropertyFile(lastUserSettings.getAbsolutePath(), properties);
             }
@@ -48,7 +60,7 @@ public class StudentConsole {
                 properties.getProperty("pathOfProject"));
 
 
-        if(!controller.login()){
+        if (!controller.login()) {
             return;
         }
 
@@ -68,6 +80,8 @@ public class StudentConsole {
     }
 
     private static Properties getPropertyFile(String filename) {
+        if (!new File(filename).exists())
+            return null;
 
         Properties prop = new Properties();
         try (InputStreamReader inputStream = new InputStreamReader(
@@ -82,16 +96,19 @@ public class StudentConsole {
     }
 
     private static void editProperties(Properties properties) {
-        System.out.print(String.format("%30s: ","Server IP"));
-        String ip = readLine();
-        if(validIP(ip)){
-            properties.setProperty("ip",ip );;
+        System.out.println("--- PROPERTIES ---");
+        System.out.println("Some Information is provided by the teacher");
+        System.out.println("Press [Enter] if you want to use the default value!");
+
+        String ip = nicePropertyInput("Server IP",
+                "for example: 172.18.25.250",
+                null);
+        if (validIP(ip)) {
+            properties.setProperty("ip", ip);
 
             try {
-
-                System.out.print(String.format("%30s: ","PORT"));
-                String port = readLine();
-                if(Integer.parseInt(port)<=0){
+                String port = nicePropertyInput("Port", "Application", "50555");
+                if (Integer.parseInt(port) <= 0) {
                     printError("Port is negative");
                 }
 
@@ -101,50 +118,46 @@ public class StudentConsole {
                 printError("Port invalid");
             }
 
-            System.out.print(String.format("%30s: ","EnrolementId (like it170001)"));
-            String enrolementId = readLine();
-            if(!enrolementId.isEmpty()){
+            String enrolementId = nicePropertyInput("EnrolementId", "like it170001", null);
+            if (!enrolementId.isEmpty()) {
                 properties.setProperty("enrolementId", enrolementId);
 
 
-                System.out.print(String.format("%30s: ","CatalogNr"));
-                String catalogNr = readLine();
-                if(!catalogNr.isEmpty()){
+                String catalogNr = nicePropertyInput("CatalogNr",
+                        "like \"12\"",
+                        null);
+                if (!catalogNr.isEmpty()) {
                     properties.setProperty("catalogNr", catalogNr);
 
-                    System.out.print(String.format("%30s: ","Firstname"));
-                    String firstName = readLine();
-                    if(!firstName.isEmpty()){
+                    String firstName = nicePropertyInput("Firstname",
+                            null,
+                            null);
+                    if (!firstName.isEmpty()) {
                         properties.setProperty("firstName", firstName);
 
-                        System.out.print(String.format("%30s: ", "Lastname"));
-                        String lastName = readLine();
-                        if(!lastName.isEmpty()){
+                        String lastName = nicePropertyInput("Lastname",null,null);
+                        if (!lastName.isEmpty()) {
                             properties.setProperty("lastName", lastName);
 
-                            System.out.print(String.format("%30s: ","Projectpath"));
-                            String projectPath = readLine();
-                            if(new File(projectPath).exists()){
+                            String projectPath = nicePropertyInput("Projectpath","Directory for all test resources",System.getProperty("user.dir"));
+                            if (new File(projectPath).exists()) {
                                 properties.setProperty("pathOfProject", projectPath);
-                            }
-                            else {
+                            } else {
                                 printError("Project Path invalid");
                             }
-                        }
-                        else {
+                        } else {
                             printError("Lastname empty");
                         }
-                    } else{
+                    } else {
                         printError("Firstname empty");
                     }
-                } else{
+                } else {
                     printError("CatalogNr empty");
                 }
-            } else{
+            } else {
                 printError("EnrolementId empty");
             }
-        }
-        else {
+        } else {
             printError("IP invalid");
         }
     }
@@ -169,35 +182,72 @@ public class StudentConsole {
     }
 
     private static String readLine() {
-        Scanner in = new Scanner(System.in);
-        return in.next();
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            return br.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    public static void printError(String msg){
+    public static void printError(String msg) {
         System.err.println("---------------------------------------------------");
-        System.err.println("ERROR: "+msg);
+        System.err.println("ERROR: " + msg);
         System.err.println("---------------------------------------------------");
         System.exit(1);
     }
 
-    public static boolean validIP (String ip) {
+    public static String nicePropertyInput(String propertyName, String description, String defaultValue) {
+        System.out.format(">--------------------\n");
+        if (defaultValue == null || defaultValue.isEmpty()) {
+            System.out.format("%s: (no default value)\n", propertyName);
+        } else {
+            System.out.format("%s: (default: %s)\n", propertyName, defaultValue);
+        }
+
+        if (description != null && !description.isEmpty())
+            System.out.format("%s\n", description);
+
+        System.out.format("> ");
+
+        //READ
+        String res = readLine();
+        if ((res == null || res.isEmpty()) && defaultValue != null && !defaultValue.isEmpty()) {
+            return defaultValue;
+        } else if (res == null || res.isEmpty()) {
+            printError("No Input");
+        }
+        return res;
+    }
+
+    public static void printHeader() {
+        System.out.println("------------------------------------------------------------");
+        System.out.println("-----                                                  -----");
+        System.out.println("-----            TESTUMGEBUNG CLIENT CONSOLE           -----");
+        System.out.println("-----                                                  -----");
+        System.out.println("------------------------------------------------------------");
+        System.out.println();
+    }
+
+    public static boolean validIP(String ip) {
         try {
-            if ( ip == null || ip.isEmpty() ) {
+            if (ip == null || ip.isEmpty()) {
                 return false;
             }
 
-            String[] parts = ip.split( "\\." );
-            if ( parts.length != 4 ) {
+            String[] parts = ip.split("\\.");
+            if (parts.length != 4) {
                 return false;
             }
 
-            for ( String s : parts ) {
-                int i = Integer.parseInt( s );
-                if ( (i < 0) || (i > 255) ) {
+            for (String s : parts) {
+                int i = Integer.parseInt(s);
+                if ((i < 0) || (i > 255)) {
                     return false;
                 }
             }
-            if ( ip.endsWith(".") ) {
+            if (ip.endsWith(".")) {
                 return false;
             }
 
