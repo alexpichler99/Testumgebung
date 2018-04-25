@@ -86,7 +86,7 @@ public class StudentConsole {
         Properties prop = new Properties();
         try (InputStreamReader inputStream = new InputStreamReader(
                 new BufferedInputStream(new FileInputStream(filename)),
-                Charset.forName("UTF-8"))) {
+                Charset.forName("UTF8"))) {
             prop.load(inputStream);
         } catch (IOException e) {
             FileUtils.log(Level.ERROR, e.getMessage());
@@ -174,7 +174,7 @@ public class StudentConsole {
 
     private static void setPropertyFile(String filename, Properties properties) {
         try (OutputStreamWriter stream = new OutputStreamWriter(new FileOutputStream(filename),
-                Charset.forName("UTF-8"))) {
+                Charset.forName("UTF8"))) {
             properties.store(stream, "Last User settings of 'Testumgebung'");
         } catch (IOException ex) {
             FileUtils.log(Level.ERROR, ex.getMessage());
